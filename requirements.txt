@@ -1,0 +1,9 @@
+Flask>=2.2
+flask-cors>=3.0
+flask-jwt-extended>=4.4
+flask-sqlalchemy>=3.0
+psycopg2-binary>=2.9
+alembic>=1.10
+python-dotenv>=1.0
+flask-migrate>=4.0       # pour gérer les migrations
+flask-restful>=0.3

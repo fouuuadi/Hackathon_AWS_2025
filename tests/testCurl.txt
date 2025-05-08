@@ -1,0 +1,24 @@
+curl http://localhost:5000/                    # Hello World
+curl http://localhost:5000/health              # Statut DB
+
+# Inscription
+curl -X POST http://localhost:5000/api/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{"username":"test","password":"azerty"}'
+
+# Connexion
+curl -i -X POST http://localhost:5000/api/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"username":"test","password":"azerty"}' \
+     -c cookies.txt
+
+# Route protégée
+curl -b cookies.txt http://localhost:5000/api/protected
+
+# Rafraîchir
+curl -X POST http://localhost:5000/api/auth/refresh \
+     -b cookies.txt -c cookies.txt
+
+# Logout
+curl -X POST http://localhost:5000/api/auth/logout \
+     -b cookies.txt -c cookies.txt
