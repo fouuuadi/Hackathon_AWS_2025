@@ -1,76 +1,52 @@
-````markdown
-# Backend_Hackathon_AWS
+   # Backend_Hackathon_AWS
 
-API **Flask** + **React** + **PostgreSQL**
+   # Backend Flask + React + PostgreSQL
 
----
+   ## Prérequis
 
-## Prérequis
+   - Python 3.11
+   - Node.js / npm (pour le frontend)
+   - Docker & Docker Compose (optionnel)
 
-- **Python 3.11**  
-- **Node.js & npm** (pour le frontend)  
-- **Docker & Docker Compose** (optionnel, pour la mise en place rapide de la base)
+   ## Installation
 
----
+   1. Clone le dépôt  
+      ```bash
+      git clone https://…/ton-projet.git
+      cd ton-projet/backend_hackathon
 
-## Installation locale
+   2. Crée et active l’environnement virtuel
 
-1. **Clone** le dépôt et place-toi dans le dossier backend :
-   ```bash
-git clone https://…/ton-projet.git
-cd ton-projet/backend_hackathon
-````
+   python3.11 -m venv venv
+   source venv/bin/activate        # Linux/macOS
+   # ou .\venv\Scripts\Activate.ps1 # Windows PowerShell
 
-2. **Crée** et **active** un environnement virtuel :
+   3. Installe les dépendances Python
 
-   ```bash
-   ```
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ou
+   pip3 install --upgrade pip
+   pip3 install -r requirements.txt
 
-python3.11 -m venv venv
 
-# Linux / macOS
+   4. Configure l’accès à la DB avec supabase
 
-source venv/bin/activate
+   Crée un fichier .env à la racine :
 
-# Windows (PowerShell)
+   DATABASE_URL=postgresql://postgres.<project-ref>:<PASSWORD>@aws-0-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require
+   SECRET_KEY=<clé_aleatoire>
 
-.\venv\Scripts\Activate.ps1
+   5. Initialise et applique les migrations
 
-````
-3. **Installe** les dépendances Python :
-   ```bash
-pip install --upgrade pip
-pip install -r requirements.txt
-# ou, si tu préfères :
-pip3 install --upgrade pip
-pip3 install -r requirements.txt
-````
+   export FLASK_APP=manage.py
+   flask db init      # une seule fois
+   flask db migrate
+   flask db upgrade
 
-4. **Configure** l’accès à la base PostgreSQL (Supabase) :
-   Crée un fichier `.env` à la racine :
+   6. Demarre le serveur
 
-   ```ini
-   ```
+   python3 manage.py
 
-DATABASE\_URL=postgresql://postgres.<project-ref>:<PASSWORD>@aws-0-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require
-SECRET\_KEY=\<clé\_aleatoire>
 
-````
-5. **Initialise** et **applique** les migrations :
-   ```bash
-export FLASK_APP=manage.py
-flask db init      # une seule fois
-flask db migrate
-flask db upgrade
-````
 
-6. **Démarre** le serveur :
-
-   ```bash
-   ```
-
-python3 manage.py
-
-```
-L’API écoute alors sur http://localhost:5005
-```
