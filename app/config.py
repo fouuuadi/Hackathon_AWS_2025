@@ -11,6 +11,8 @@ class Config:
     """
     # URL de connexion à la base PostgreSQL (SQLAlchemy)
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    # URL de connexion à la base MongoDB
+    MONGO_URI = os.getenv('MONGO_URI')
     # Clé secrète pour signer les JWT et sécuriser les sessions
     JWT_SECRET_KEY = os.getenv('SECRET_KEY')
     # Emplacement des tokens JWT : ici, dans des cookies HTTP-only
@@ -19,6 +21,11 @@ class Config:
     JWT_COOKIE_CSRF_PROTECT = True
     # Autorise l'envoi de credentials (cookies) via CORS
     CORS_SUPPORTS_CREDENTIALS = True
+    
+    # Par défaut on protège l'API entière sous /api/
+    JWT_ACCESS_COOKIE_PATH    = '/api/'
+    # Le refresh token est lu sur /api/auth/refresh
+    JWT_REFRESH_COOKIE_PATH   = '/api/auth/refresh'
 
 class ProdConfig(Config):
     """

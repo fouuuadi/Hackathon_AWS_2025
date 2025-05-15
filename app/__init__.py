@@ -1,7 +1,7 @@
 # app/__init__.py
 from flask import Flask
 from .config import Config
-from .extensions import db, jwt, cors
+from .extensions import jwt, cors, mongo
 
 
 def create_app(config_class=Config):
@@ -9,19 +9,27 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     # Initialize extensions
-    db.init_app(app)
+    #db.init_app(app)
     jwt.init_app(app)
     cors.init_app(app)
+    mongo.init_app(app)
 
-    # Log database connection on startup
+# --- Vérification / création de la base MongoDB ---
     with app.app_context():
-        try:
-            engine = db.get_engine()
-            conn = engine.connect()
-            app.logger.info(f"Connecté à la base de données : {engine.url}")
-            conn.close()
-        except Exception as e:
-            app.logger.error(f"Impossible de se connecter à la base : {e}")
+        # Nom de la DB configurée (dernière partie de MONGO_URI)
+        db_name = mongo.db.name
+        client  = mongo.cx  # instance de MongoClient
+
+        # Récupère la liste existante des databases
+        existing_dbs = client.list_database_names()
+
+        if db_name not in existing_dbs:
+            # Crée directement la collection principale (ex. users)
+            client[db_name].create_collection('users')
+            print(f"📦 Base MongoDB '{db_name}' créée avec collection 'users'.")
+        else:
+            print(f"✔️  Base MongoDB '{db_name}' déjà présente.")
+
 
     # Register blueprints
     from .routes.auth import auth_bp

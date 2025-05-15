@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
@@ -19,14 +19,17 @@ def register():
     Renvoie 201 + { msg, id } ou 400 en cas d'erreur (username déjà pris).
     """
     data = request.get_json()
+    if not data.get('username') or not data.get('password'):
+        return jsonify(msg="Username & password requis"), 400
     try:
-        # Appel du service métier pour créer l'utilisateur
         user = register_user(data['username'], data['password'])
-        return jsonify(msg="Utilisateur créé", id=user.id), 201
+        return jsonify(msg="Utilisateur créé", id=user["id"]), 201
     except ValueError as e:
-        # Username déjà existant ou autre erreur de validation
         return jsonify(msg=str(e)), 400
-
+    except Exception as e:
+        print(f"Erreur création user : {e}")
+        return jsonify(msg="Erreur interne"), 500
+    
 @auth_bp.route('/login', methods=['POST'])
 def login():
     """

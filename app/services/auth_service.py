@@ -1,4 +1,5 @@
 from flask_jwt_extended import create_access_token, create_refresh_token
+from werkzeug.security import check_password_hash
 from app.repositories.user_repository import get_by_username, create_user
 
 # Service d'authentification : contenu de la logique métier
@@ -33,9 +34,9 @@ def authenticate_user(username: str, password: str):
     # Recherche en base l'utilisateur par son username
     user = get_by_username(username)
     # Vérifie à la fois existence et validité du mot de passe
-    if user and user.check_password(password):
+    if user and check_password_hash(user["password"], password):
         # Flask-JWT-Extended exige que l'identity soit une chaîne
-        sub = str(user.id)
+        sub = str(user["id"])
         # Génération du JWT d'accès
         access = create_access_token(identity=sub)
         # Génération du JWT de rafraîchissement

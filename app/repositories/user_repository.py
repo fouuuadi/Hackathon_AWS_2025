@@ -1,12 +1,26 @@
-from app.models.user import User
-from app.extensions import db
+from app.extensions import mongo
+from werkzeug.security import generate_password_hash, check_password_hash
 
-def get_by_username(username):
-    return User.query.filter_by(username=username).first()
+USERS = mongo.db.users
 
-def create_user(username, password):
-    user = User(username=username)
-    user.set_password(password)
-    db.session.add(user)
-    db.session.commit()
-    return user
+def get_by_username(username: str):
+    doc = USERS.find_one({"username": username})
+    if not doc:
+        return None
+    return {
+        "id":       str(doc["_id"]),
+        "username": doc["username"],
+        "password": doc["password"]
+    }
+
+def create_user(username: str, password: str):
+    pw_hash = generate_password_hash(password)
+    res     = USERS.insert_one({
+        "username": username,
+        "password": pw_hash
+    })
+    return {
+        "id":       str(res.inserted_id),
+        "username": username,
+        "password": pw_hash
+    }
