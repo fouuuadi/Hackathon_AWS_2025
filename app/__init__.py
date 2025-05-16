@@ -10,26 +10,6 @@ def create_app(config_class=Config):
     jwt.init_app(app)
     cors.init_app(app)
 
-    # Créer la table si elle n'existe pas
-    table_name = app.config["DYNAMODB_TABLE_NAME"]
-    try:
-        table = dynamodb.create_table(
-            TableName=table_name,
-            KeySchema=[
-                {"AttributeName": "id", "KeyType": "HASH"}
-            ],
-            AttributeDefinitions=[
-                {"AttributeName": "id", "AttributeType": "S"}
-            ],
-            ProvisionedThroughput={
-                "ReadCapacityUnits": 5,
-                "WriteCapacityUnits": 5
-            }
-        )
-        table.wait_until_exists()
-        print(f"📦 Table '{table_name}' créée avec succès.")
-    except dynamodb.meta.client.exceptions.ResourceInUseException:
-        print(f"✔️ Table '{table_name}' déjà présente.")
 
     # Enregistrer les blueprints
     from .routes.card import card_bp
