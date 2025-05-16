@@ -32,9 +32,11 @@ def create_app(config_class=Config):
 
 
     # Register blueprints
+    from .routes.card import card_bp
     from .routes.auth import auth_bp
     from .routes.protected import protected_bp
     from .routes.health import health_bp
+    app.register_blueprint(card_bp, url_prefix="/api/cards")
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(protected_bp, url_prefix="/api")
     app.register_blueprint(health_bp)
