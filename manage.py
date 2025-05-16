@@ -1,11 +1,11 @@
 from app import create_app                    # Importe la factory pour créer l'instance Flask
 from flask_migrate import Migrate               # Extension pour gérer les migrations Alembic
-from app.extensions import db                   # Instance SQLAlchemy déclarée dans extensions
+from app.extensions import dynamodb                   # Instance SQLAlchemy déclarée dans extensions
 
 # Création de l'application à partir de la factory
 app = create_app()
 # Liaison de Flask-Migrate avec l'app et la base de données
-migrate = Migrate(app, db)
+migrate = Migrate(app, dynamodb)
 
 # Route de test basique (Hello World) pour vérifier que l'app tourne
 @app.route('/', methods=['GET'])
