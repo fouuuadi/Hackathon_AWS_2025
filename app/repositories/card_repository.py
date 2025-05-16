@@ -1,8 +1,8 @@
-from bson.objectid import ObjectId
-from app.extensions import mongo
+from app.extensions import dynamodb
+from uuid import uuid4
 
-# Accès à la collection "cards" dans MongoDB
-CARDS = mongo.db.cards
+TABLE_NAME = "cards"
+table = dynamodb.Table(TABLE_NAME)
 
 
 def get_card(card_id: str) -> dict:
@@ -12,21 +12,14 @@ def get_card(card_id: str) -> dict:
     - Retourne un dict standardisé ou None si introuvable.
     """
     try:
-        doc = CARDS.find_one({"_id": ObjectId(card_id)})
-    except Exception:
+        response = table.get_item(Key={"id": card_id})
+        item = response.get("Item")
+        if not item:
+            return None
+        return item
+    except Exception as e:
+        print(f"Erreur lors de la récupération de la carte : {e}")
         return None
-    if not doc:
-        return None
-    # Retourner un document avec l'ID sous forme de string
-    return {
-        "id": str(doc["_id"]),
-        "url": doc.get("url"),
-        "text": doc.get("text"),
-        "img": doc.get("img"),
-        "note": doc.get("note"),
-        "tags": doc.get("tags", []),
-        "resume_information": doc.get("resume_information")
-    }
 
 
 def create_card(data: dict) -> dict:
@@ -35,15 +28,12 @@ def create_card(data: dict) -> dict:
     - data : dict contenant les clés url, text, img, note, tags, resume_information.
     - Insère le document en base et retourne le dict créé avec l'ID.
     """
-    payload = {
-        "url": data["url"],
-        "text": data["text"],
-        "img": data.get("img"),
-        "note": data.get("note"),
-        "tags": data.get("tags", []),
-        "resume_information": data.get("resume_information")
-    }
-    # Insert et récupération de l'ID généré
-    result = CARDS.insert_one(payload)
-    payload["id"] = str(result.inserted_id)
-    return payload
+    try:
+        card_id = str(uuid4())
+        data["id"] = card_id
+        table.put_item(Item=data)
+        return data
+    except Exception as e:
+        print(f"Erreur lors de la création de la carte : {e}")
+        return None
+

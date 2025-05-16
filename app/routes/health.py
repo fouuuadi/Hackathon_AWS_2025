@@ -18,14 +18,15 @@
 
 
 from flask import Blueprint, jsonify
-from app.extensions import mongo
-health_bp = Blueprint('health', __name__)
+from app.extensions import dynamodb
 
-@health_bp.route('/health')
+health_bp = Blueprint("health", __name__)
+
+@health_bp.route("/health")
 def health():
     try:
-        # list collections as test
-        _ = mongo.db.list_collection_names()
+        # Vérifie que la table est bien connectée
+        _ = dynamodb.Table("cards").table_status
         return jsonify(db="connected"), 200
     except Exception as e:
         return jsonify(db="error", msg=str(e)), 500
