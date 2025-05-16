@@ -1,42 +1,60 @@
 version: "3.8"
 
 services:
-  db:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: fouad18
-      POSTGRES_DB: postgres
-    volumes:
-      - db_data:/var/lib/postgresql/data
+  mongo:
+    container_name: mongo
+    image: mongo:5.0
     ports:
-      - "5432:5432"
+      - "27017:27017"
+    environment:
+      # Identifiants root MongoDB (définis dans .env)
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express:0.54
+    ports:
+      - "8081:8081"
+    environment:
+      # Connexion à MongoDB
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_MONGODB_AUTH_DATABASE: admin
+      ME_CONFIG_MONGODB_SERVER: mongo
+      # Authentification basique pour l'interface
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_CONFIG_BASICAUTH_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_CONFIG_BASICAUTH_PASSWORD}
+    depends_on:
+      mongo:
+        condition: service_healthy
 
   backend:
+    container_name: backend
     build:
       context: .
       dockerfile: Dockerfile
-    depends_on:
-      - db
-    environment:
-      DATABASE_URL: postgresql://postgres:fouad18@db:5432/postgres
-      SECRET_KEY: ${SECRET_KEY}
-      FLASK_ENV: development
-      FLASK_APP: manage.py
     ports:
-      - "5000:5000"
+      # Expose le port interne 5005 (aligné avec manage.py)
+      - "5005:5005"
+    env_file:
+      - .env
+    depends_on:
+      mongo:
+        condition: service_healthy
     volumes:
+      # Montre le code en live pour dev
       - .:/app
 
-  frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-
 volumes:
-  db_data:
+  mongo_data:
