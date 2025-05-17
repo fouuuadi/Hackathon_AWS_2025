@@ -1,6 +1,8 @@
 from bson.objectid import ObjectId
 from app.extensions import mongo
 from app.repositories.board_repository import add_card_to_board
+import re
+from urllib.parse import urlparse
 
 # Accès à la collection "cards" dans MongoDB
 CARDS = mongo.db.card
@@ -25,6 +27,7 @@ def get_card(card_id: str) -> dict:
         "id": str(doc["_id"]),
         "title": doc.get("title"),
         "url": doc.get("url"),
+        "domain": doc.get("domain", ""),  # Domaine extrait de l'URL
         "text": doc.get("text"),
         "img": doc.get("img"),
         "note": doc.get("note"),  # note libre (string) notée par l'utilisateur
@@ -41,9 +44,56 @@ def create_card(data: dict) -> dict:
     - note : texte libre (string) pour la carte.
     Insère le document en base et retourne le dict créé avec l'ID.
     """
+    # Extraction du domaine de l'URL
+    url = data["url"]
+    domain = ""
+    try:
+        parsed_url = urlparse(url)
+        domain_parts = parsed_url.netloc.split('.')
+        # Récupère le nom de domaine principal (ex: wikipedia de www.wikipedia.org)
+        if len(domain_parts) >= 2:
+            domain = domain_parts[-2]
+    except:
+        domain = ""
+    
+    # Génération d'un titre si non fourni
+    title = data.get("title")
+    if not title or title.strip() == "":
+        # Utilise le domaine ou la dernière partie de l'URL comme titre par défaut
+        base_title = ""
+        if domain:
+            base_title = f"Contenu {domain.capitalize()}"
+        else:
+            # Extrait la dernière partie de l'URL après le dernier /
+            path_parts = url.rstrip('/').split('/')
+            if len(path_parts) > 0 and path_parts[-1]:
+                base_title = path_parts[-1].replace('-', ' ').replace('_', ' ').capitalize()
+            else:
+                base_title = "Nouvelle carte"
+        
+        # Vérifier si des cartes avec le même titre de base existent déjà
+        # et ajouter un compteur (#1, #2, etc.)
+        existing_cards = list(CARDS.find({"url": url}))
+        
+        # Compter combien de cartes ont déjà un titre basé sur cette URL
+        counter = 1
+        for card in existing_cards:
+            card_title = card.get("title", "")
+            # Vérifie si le titre suit le format "base_title #N"
+            if card_title.startswith(base_title + " #"):
+                try:
+                    num = int(card_title.split("#")[1])
+                    counter = max(counter, num + 1)
+                except:
+                    pass
+        
+        # Ajouter le compteur au titre
+        title = f"{base_title} #{counter}"
+    
     payload = {
-        "title": data.get("title", ""),
-        "url": data["url"],
+        "title": title,
+        "url": url,
+        "domain": domain,  # Stocke le domaine extrait
         "text": data["text"],
         "img": data.get("img"),
         "note": data.get("note"),  # note libre (string) saisie par l'utilisateur
