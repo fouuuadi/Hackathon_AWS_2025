@@ -1,52 +1,74 @@
-   # Backend_Hackathon_AWS
-
-   # Backend Flask + React + PostgreSQL
-
-   ## Prérequis
-
-   - Python 3.11
-   - Node.js / npm (pour le frontend)
-   - Docker & Docker Compose (optionnel)
-
-   ## Installation
-
-   1. Clone le dépôt  
-      ```bash
-      git clone https://…/ton-projet.git
-      cd ton-projet/backend_hackathon
-
-   2. Crée et active l’environnement virtuel
-
-   python3.11 -m venv venv
-   source venv/bin/activate        # Linux/macOS
-   # ou .\venv\Scripts\Activate.ps1 # Windows PowerShell
-
-   3. Installe les dépendances Python
-
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ou
-   pip3 install --upgrade pip
-   pip3 install -r requirements.txt
+# Projet de Gestion Collaborative de Cards et Boards
 
 
-   4. Configure l’accès à la DB avec supabase
+## Description du projet
 
-   Crée un fichier .env à la racine :
+Ce projet consiste en une **extension web** permettant à un utilisateur (User) d’enregistrer et organiser facilement des contenus variés (liens, images, textes) sous forme de **cards**. Ces cards sont ensuite classées dans des **boards**.
 
-   DATABASE_URL=postgresql://postgres.<project-ref>:<PASSWORD>@aws-0-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require
-   SECRET_KEY=<clé_aleatoire>
+- Un **User** peut créer une infinité de **boards**.
+- Un **board** peut contenir une infinité de **cards**.
+- Chaque **card** appartient obligatoirement à un **board**.
 
-   5. Initialise et applique les migrations
+---
 
-   export FLASK_APP=manage.py
-   flask db init      # une seule fois
-   flask db migrate
-   flask db upgrade
+### Contenu d’une Card
 
-   6. Demarre le serveur
+Chaque card peut contenir les informations suivantes :
 
-   python3 manage.py
+- **URL** : lien vers la source.
+- **Texte extrait** de la source.
+- **Image** associée.
+- **Note** ajoutée par l’utilisateur.
+- **Tags** pour faciliter la recherche.
+- **Résumé** des informations importantes.
+
+---
+
+### Objectif fonctionnel
+
+Ce système permet à des utilisateurs de collaborer et partager de la veille sur différents sujets ou domaines, **en équipe**.
+
+---
+
+## Infrastructure & Technologies utilisées
+
+- **AWS LightSail** pour l’hébergement de l’application.
+- **AWS Secrets Manager** pour la gestion sécurisée des secrets et des clés.
+- **Politiques IAM** pour la gestion des permissions et accès.
+- **DynamoDB** comme base de données NoSQL.
+- **Route 53** pour la gestion du nom de domaine et DNS.
+
+---
+
+## État actuel & défis
+
+L’application n’est pas encore pleinement fonctionnelle sur l’infrastructure AWS LightSail, en raison de plusieurs difficultés techniques rencontrées lors du déploiement.
+
+Mise en place du projet fonctionnel de secours:
+- Fonction du projet, sans le déploiement AWS
+- Utilisation de Flask
+- Utilisation de MongoDB
+- Mise en place d'un Docker, docker-compose
+   
+---
+
+## Perspectives & évolutions prévues
+
+- Mise en place d’un **pipeline CI/CD** pour automatiser et faciliter le déploiement et le développement continu.
+- Intégration d’un **CDN CloudFront** pour améliorer la distribution des contenus.
+- Utilisation de **S3** comme solution de stockage pour les images et autres fichiers.
+- Une migration vers **AWS EC2** permettrait d'avoir un contrôle plus fin sur l'infrastructure serveur, facilitant la gestion des ressources et la personnalisation de l'environnement pour optimiser les performances de l'application.
+
+---
+## Equipe Back-end / DevOps: 
+- [Fouad](https://github.com/fouuuadi)
+- [Arnaud](https://github.com/Jeck0v)
+
+## Conclusion
+
+Ce projet vise à offrir une solution collaborative efficace et évolutive pour la collecte et l’organisation d’informations diverses, en tirant parti des services AWS pour une infrastructure robuste et scalable.
 
 
+
+*Dernière mise à jour : Mai 2025*
 
