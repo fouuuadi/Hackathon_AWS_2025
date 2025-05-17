@@ -12,6 +12,8 @@ services:
       - /var/lib/letsencrypt:/var/lib/letsencrypt:rw
     depends_on:
       - backend
+    networks:
+      - back
 
   backend:
     container_name: backend
@@ -24,3 +26,9 @@ services:
       - .env
     volumes:
       - .:/app
+    networks:
+      - back
+
+networks:
+  back:
+    driver: bridge
