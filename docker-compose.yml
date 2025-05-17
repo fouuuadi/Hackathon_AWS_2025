@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
     expose:
       - "5005"
+    ports:
+      - "5005:5005"
     env_file:
       - .env
     volumes:
