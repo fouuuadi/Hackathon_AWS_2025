@@ -1,34 +1,36 @@
 services:
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-      - /var/lib/letsencrypt:/var/lib/letsencrypt:rw
-    depends_on:
-      - backend
-    networks:
-      - back
-
   backend:
     container_name: backend
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "5005:5005"
+    expose:
+      - "5005"
     env_file:
       - .env
     volumes:
       - .:/app
     networks:
-      - back
+      - nginx_proxy
+
+  nginx-proxy-manager:
+    container_name: nginx-proxy-manager
+    image: jc21/nginx-proxy-manager:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "81:81"
+      - "443:443"
+    volumes:
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
+    networks:
+      - nginx_proxy
+
+volumes:
+  npm_data:
+  npm_letsencrypt:
 
 networks:
-  back:
+  nginx_proxy:
     driver: bridge
