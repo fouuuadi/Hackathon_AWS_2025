@@ -1,4 +1,4 @@
-# Projet de Gestion Collaborative de Cards et Boards
+# UNFAIR (Sujet 2) - Panoramix Back-end
 
 
 ## Description du projet
