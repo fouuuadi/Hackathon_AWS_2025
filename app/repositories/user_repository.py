@@ -1,7 +1,7 @@
 from app.extensions import mongo
 from werkzeug.security import generate_password_hash, check_password_hash
 
-USERS = mongo.db.users
+USERS = mongo.db.user
 
 def get_by_username(username: str):
     doc = USERS.find_one({"username": username})

@@ -1,41 +1,35 @@
-# app/routes/card.py
 from flask import Blueprint, request, jsonify
-from app.repositories.card_repository import create_card_with_board, get_card
+from app.services.card_service import create_card_with_board
 
+# Blueprint pour gérer les cartes
 card_bp = Blueprint('card', __name__)
 
 @card_bp.route('/cards', methods=['POST'])
 def create_card_route():
     """
-    Expects JSON body:
-    {
-      "title": "Titre de la carte",
-      "url": "...",
-      "text": "...",
-      "img": "...",
-      "note": 5,
-      "tags": ["tag1","tag2"],
-      "resume_information": "..."
-    }
-    Returns 201 + le document créé (avec son champ 'id').
+    Endpoint pour créer une carte et l'associer à un board.
+    Attends un JSON avec :
+      - url, text, img, note (string), tags, resume_information, board_name
+    Retourne :
+      {
+        "card": { ... },
+        "board": { ... }  # ou null si pas de board_name fourni
+      }
     """
     data = request.get_json()
     card, board = create_card_with_board(data)
-
-    # on enveloppe la carte et le board dans la réponse
     response = {"card": card}
-    if board is not None:
+    if board:
         response["board"] = board
-
     return jsonify(response), 201
-
 
 @card_bp.route('/cards/<card_id>', methods=['GET'])
 def get_card_route(card_id):
     """
-    Récupère la carte dont l'id est passé en URL.
-    Returns 200 + le document ou 404 si introuvable.
+    Récupère une carte par son ID.
+    Renvoie 200 + card JSON ou 404 si introuvable.
     """
+    from app.repositories.card_repository import get_card
     card = get_card(card_id)
     if not card:
         return jsonify(msg="Card not found"), 404

@@ -25,7 +25,9 @@ def create_app(config_class=Config):
 
         if db_name not in existing_dbs:
             # Crée directement la collection principale (ex. users)
-            client[db_name].create_collection('users')
+            client[db_name].create_collection('user')
+            client[db_name].create_collection('card')
+            client[db_name].create_collection('board')
             print(f"📦 Base MongoDB '{db_name}' créée avec collection 'users'.")
         else:
             print(f"✔️  Base MongoDB '{db_name}' déjà présente.")
@@ -36,9 +38,11 @@ def create_app(config_class=Config):
     from .routes.auth import auth_bp
     from .routes.protected import protected_bp
     from .routes.health import health_bp
-    app.register_blueprint(card_bp, url_prefix="/api/cards")
+    from .routes.board import board_bp
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(protected_bp, url_prefix="/api")
     app.register_blueprint(health_bp)
+    app.register_blueprint(card_bp, url_prefix='/api')
+    app.register_blueprint(board_bp, url_prefix='/api')
 
     return app
