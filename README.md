@@ -49,7 +49,14 @@ Mise en place du projet fonctionnel de secours:
 - Utilisation de Flask
 - Utilisation de MongoDB
 - Mise en place d'un Docker, docker-compose
-   
+
+### Lancement  de l'app: 
+```bash
+docker compose up --build
+```
+```bash
+docker compose down -v
+```
 ---
 
 ## Perspectives & évolutions prévues
@@ -63,6 +70,7 @@ Mise en place du projet fonctionnel de secours:
 ## Equipe Back-end / DevOps: 
 - [Fouad](https://github.com/fouuuadi)
 - [Arnaud](https://github.com/Jeck0v)
+
 
 ## Conclusion
 
